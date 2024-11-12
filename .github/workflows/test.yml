@@ -1,0 +1,46 @@
+name: ARM Template Validation and Export
+
+on:
+  push:
+    branches:
+      - main # Trigger on push to the main branch
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    # Step 1: Checkout repository
+    - name: Checkout Repository
+      uses: actions/checkout@v2
+
+    # Step 2: Install Node.js (v18.x)
+    - name: Install Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18.x'
+
+    # Step 3: Install npm packages from package.json
+    - name: Install npm packages
+      run: |
+        npm install
+      working-directory: ./<folder-of-the-package.json-file> # Replace with the correct folder
+
+    # Step 4: Validate Data Factory resources (you must specify your resource details)
+    - name: Validate Data Factory Resources
+      run: |
+        npm run build validate ./<Root-folder-from-Git-configuration-settings-in-ADF> /subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/<Your-ResourceGroup-Name>/providers/Microsoft.DataFactory/factories/<Your-Factory-Name>
+      working-directory: ./<folder-of-the-package.json-file> # Replace with the correct folder
+
+    # Step 5: Validate and Generate ARM Template
+    - name: Validate and Generate ARM Template
+      run: |
+        npm run build export ./<Root-folder-from-Git-configuration-settings-in-ADF> /subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/<Your-ResourceGroup-Name>/providers/Microsoft.DataFactory/factories/<Your-Factory-Name> "ArmTemplate"
+      working-directory: ./<folder-of-the-package.json-file> # Replace with the correct folder
+
+    # Step 6: Publish the artifact (ARM Template) to the GitHub Actions Artifact Storage
+    - name: Publish ARM Template Artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: ArmTemplates
+        path: ./<folder-of-the-package.json-file>/ArmTemplate # Replace with the correct folder
