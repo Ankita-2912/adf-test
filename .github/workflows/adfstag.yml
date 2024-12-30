@@ -11,7 +11,7 @@ jobs:
       name: Test
     runs-on:
       group: DataOps
-      labels: SHRDEV
+      labels: SHRSTG
     defaults:
       run:
         shell: bash
