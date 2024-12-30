@@ -7,8 +7,16 @@ permissions:
  
 jobs:
   build:
-    runs-on: ubuntu-latest
-    name: 'This deploys to staging'
+    environment:
+      name: Test
+    runs-on:
+      group: DataOps
+      labels: SHRDEV
+    defaults:
+      run:
+        shell: bash
+
+    name: 'This deploys to Staging'
     steps:
     - uses: actions/checkout@v3
       with:
