@@ -29,7 +29,7 @@ jobs:
       uses: Azure/powershell@v1
       with:
         # Specify the Az PowerShell script here.
-        inlineScript: pwsh -File ./QG-QC-ADF-STG-001/PrePostDeploymentScript.ps1 -armTemplate "./QG-QC-ADF-STG-001/ARMTemplateForFactory.json" -ResourceGroupName rg-db-stg-qc-001 -DataFactoryName QG-QC-ADF-STG-001 -predeployment:$true -deleteDeployment:$false
+        inlineScript: pwsh -File ./QG-QC-ADF-DEV-001/PrePostDeploymentScript.ps1 -armTemplate "./QG-QC-ADF-DEV-001/ARMTemplateForFactory.json" -ResourceGroupName rg-db-stg-qc-001 -DataFactoryName QG-QC-ADF-STG-001 -predeployment:$true -deleteDeployment:$false
         # Azure PS version to be used to execute the script, example: 1.8.0, 2.8.0, 3.4.0. To use the latest version, specify "latest".
         azPSVersion: latest
     - name: Deploy Azure Resource Manager (ARM) Template
@@ -41,7 +41,7 @@ jobs:
         resourceGroupName: 'rg-db-stg-qc-001'
         # Specify the path to the ADF ARM template. In this scenario, the workflow is in the same branch, 
         # hence we only add the folder and arm template name to the path
-        template: ./QG-QC-ADF-STG-001/ARMTemplateForFactory.json
+        template: ./QG-QC-ADF-DEV-001/ARMTemplateForFactory.json
         # Incremental (only add resources to resource group) or Complete (remove extra resources from resource group) or Validate (only validates the template).
         deploymentMode: Incremental
         # Supply deployment parameter values. In this simple scenario, 
@@ -53,6 +53,6 @@ jobs:
       uses: Azure/powershell@v1
       with:
         # Specify the Az PowerShell script here.
-        inlineScript: pwsh -File ./QG-QC-ADF-STG-001/PrePostDeploymentScript.ps1 -armTemplate "./QG-QC-ADF-STG-001/ARMTemplateForFactory.json" -ResourceGroupName rg-db-stg-qc-001 -DataFactoryName QG-QC-ADF-STG-001 -predeployment:$false -deleteDeployment:$true
+        inlineScript: pwsh -File ./QG-QC-ADF-DEV-001/PrePostDeploymentScript.ps1 -armTemplate "./QG-QC-ADF-DEV-001/ARMTemplateForFactory.json" -ResourceGroupName rg-db-stg-qc-001 -DataFactoryName QG-QC-ADF-STG-001 -predeployment:$false -deleteDeployment:$true
         # Azure PS version to be used to execute the script, example: 1.8.0, 2.8.0, 3.4.0. To use the latest version, specify "latest".
         azPSVersion: latest
