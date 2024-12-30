@@ -1,0 +1,58 @@
+on:
+  workflow_dispatch:
+ 
+permissions:
+  id-token: write
+  contents: read
+ 
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    name: 'This deploys to staging'
+    steps:
+    - uses: actions/checkout@v3
+      with:
+          ref: adf_publish
+ 
+    - name: Az Powershell Installation
+      run: Install-Module -Name Az -Scope CurrentUser -Repository PSGallery -Force
+      shell: pwsh
+    - name: Azure Login
+      uses: Azure/login@v1
+      with:
+        # Paste output of `az ad sp create-for-rbac` as value of secret variable: AZURE_CREDENTIALS
+        client-id: ${{ secrets.CLIENT_ID }}
+        tenant-id: ${{ secrets.TENANT_ID }}
+        subscription-id: ${{ secrets.SUBSCRIPTION_ID }}
+        enable-AzPSSession: true
+    - name: Pre-deployment
+      uses: Azure/powershell@v1
+      with:
+        # Specify the Az PowerShell script here.
+        inlineScript: pwsh -File ./QG-QC-ADF-STG-001/PrePostDeploymentScript.ps1 -armTemplate "./QG-QC-ADF-STG-001/ARMTemplateForFactory.json" -ResourceGroupName rg-db-stg-qc-001 -DataFactoryName QG-QC-ADF-STG-001 -predeployment:$true -deleteDeployment:$false
+        # Azure PS version to be used to execute the script, example: 1.8.0, 2.8.0, 3.4.0. To use the latest version, specify "latest".
+        azPSVersion: latest
+    - name: Deploy Azure Resource Manager (ARM) Template
+      uses: Azure/arm-deploy@v1.0.6
+      with:
+        # Provide the scope of the deployment. Valid values are: 'resourcegroup', 'managementgroup', 'subscription'
+        scope: 'resourcegroup'
+        # Target resource group of the deployment.
+        resourceGroupName: 'rg-db-stg-qc-001'
+        # Specify the path to the ADF ARM template. In this scenario, the workflow is in the same branch, 
+        # hence we only add the folder and arm template name to the path
+        template: ./QG-QC-ADF-STG-001/ARMTemplateForFactory.json
+        # Incremental (only add resources to resource group) or Complete (remove extra resources from resource group) or Validate (only validates the template).
+        deploymentMode: Incremental
+        # Supply deployment parameter values. In this simple scenario, 
+        # I am only passing the name of the target ADF to which this is being deployed
+        parameters: factoryName=QG-QC-ADF-STG-001
+ 
+ 
+    - name: Post-deployment
+      uses: Azure/powershell@v1
+      with:
+        # Specify the Az PowerShell script here.
+        inlineScript: pwsh -File ./QG-QC-ADF-STG-001/PrePostDeploymentScript.ps1 -armTemplate "./QG-QC-ADF-STG-001/ARMTemplateForFactory.json" -ResourceGroupName rg-db-stg-qc-001 -DataFactoryName QG-QC-ADF-STG-001 -predeployment:$false -deleteDeployment:$true
+        # Azure PS version to be used to execute the script, example: 1.8.0, 2.8.0, 3.4.0. To use the latest version, specify "latest".
+        azPSVersion: latest
